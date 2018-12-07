@@ -18,24 +18,37 @@ import org.apache.lucene.store.FSDirectory;
 public class LuceneReadIndexFromFileExample
 {
     //directory contains the lucene indexes
-    private static final String INDEX_DIR = "indexedFilesNew";
+    private static final String MAIN_INDEX = "main_index";
+    private static final String AUXILLARY_INDEX = "auxillary_index";
  
     public static void main(String[] args) throws Exception
     {
     	
-        //Create lucene searcher. It search over a single IndexReader.
-        IndexSearcher searcher = createSearcher();
+        //Create 2 lucene searchesr. One searches over a single IndexReader. Other over auxillary index
+        IndexSearcher searcher = createSearcher(true);
+        IndexSearcher searcher_auxillary_index = createSearcher(false);
          
         //Search indexed contents using search term
-        TopDocs foundDocs = searchInContent("saul", searcher);
+        TopDocs foundDocs = searchInContent("#CBI", searcher);
+        TopDocs foundDocsNew = searchInContent("#CBI", searcher_auxillary_index);
          
         //Total found documents
-        System.out.println("Total Results :: " + foundDocs.totalHits);
+        System.out.println("Total Results from Main Index :: " + foundDocs.totalHits);
          
         //Let's print out the path of files which have searched term
         for (ScoreDoc sd : foundDocs.scoreDocs)
         {
             Document d = searcher.doc(sd.doc);
+            System.out.println("Path : "+ d.get("path") + ", Score : " + sd.score);
+        }
+        
+        //Total found documents
+        System.out.println("Total Results from Auxillary Index :: " + foundDocsNew.totalHits);
+         
+        //Let's print out the path of files which have searched term
+        for (ScoreDoc sd : foundDocsNew.scoreDocs)
+        {
+            Document d = searcher_auxillary_index.doc(sd.doc);
             System.out.println("Path : "+ d.get("path") + ", Score : " + sd.score);
         }
     }
@@ -51,9 +64,15 @@ public class LuceneReadIndexFromFileExample
         return hits;
     }
  
-    private static IndexSearcher createSearcher() throws IOException
+    private static IndexSearcher createSearcher(boolean main_index) throws IOException
     {
-        Directory dir = FSDirectory.open(Paths.get(INDEX_DIR));
+    	Directory dir;
+    	if (main_index) {
+            dir = FSDirectory.open(Paths.get(MAIN_INDEX));	
+    	}
+    	else {
+    		dir = FSDirectory.open(Paths.get(AUXILLARY_INDEX));
+    	}
          
         //It is an interface for accessing a point-in-time view of a lucene index
         IndexReader reader = DirectoryReader.open(dir);
@@ -62,4 +81,5 @@ public class LuceneReadIndexFromFileExample
         IndexSearcher searcher = new IndexSearcher(reader);
         return searcher;
     }
+
 }
