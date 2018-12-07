@@ -30,7 +30,7 @@ public class LuceneWriteIndexFromFileExample
 {
     public static void main(String[] args)
     {
-    	System.out.println("Enter 1 to create main index, 2 to create auxillary index\n");
+    	System.out.println("Enter 1 to create main index, 2 to create initial auxillary index, 3 to merge indexes \n");
     	
     	Scanner sc = new Scanner(System.in);
     	
@@ -40,12 +40,16 @@ public class LuceneWriteIndexFromFileExample
     	String docsPath="", indexPath="";
     	
     	if (inp == 1) {
-    		docsPath = "inputFiles";
-    		indexPath = "indexedFilesNew";
+    		docsPath = "all_tweets";
+    		indexPath = "main_index";
     	}
     	else if (inp == 2) {
-    		docsPath = "newFiles";
-    		indexPath = "auxillaryIndexFiles";
+    		docsPath = "new_tweets";
+    		indexPath = "auxillary_index";
+    	}
+    	else if (inp == 3) {
+    		System.out.println("merging");
+    		System.exit(0);
     	}
     	else {
     		System.out.println("Invalid command");
@@ -109,6 +113,11 @@ public class LuceneWriteIndexFromFileExample
         {
             //Index this file
             indexDoc(writer, path, Files.getLastModifiedTime(path).toMillis());
+            
+            /*
+             * increment number of tweets indexed
+             * 
+             */
         }
     }
  
@@ -116,6 +125,7 @@ public class LuceneWriteIndexFromFileExample
     {
         try (InputStream stream = Files.newInputStream(file))
         {
+        	
             //Create lucene Document
             Document doc = new Document();
              
@@ -123,6 +133,11 @@ public class LuceneWriteIndexFromFileExample
             doc.add(new LongPoint("modified", lastModified));
             doc.add(new TextField("contents", new String(Files.readAllBytes(file)), Store.YES));
              
+            System.out.println("indexed");
+        	System.out.println(doc);
+        	System.out.println("indexed");
+            
+            
             //Updates a document by first deleting the document(s)
             //containing <code>term</code> and then adding the new
             //document.  The delete and then add are atomic as seen
