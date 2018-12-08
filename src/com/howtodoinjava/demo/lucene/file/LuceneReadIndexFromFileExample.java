@@ -18,7 +18,7 @@ import org.apache.lucene.store.FSDirectory;
 public class LuceneReadIndexFromFileExample
 {
     //directory contains the lucene indexes
-    private static final String MAIN_INDEX = "main_index";
+    private static final String MAIN_INDEX = "merged_index";
     private static final String AUXILLARY_INDEX = "auxillary_index";
  
     public static void main(String[] args) throws Exception
