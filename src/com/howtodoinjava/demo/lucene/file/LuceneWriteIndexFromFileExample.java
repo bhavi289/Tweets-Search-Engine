@@ -139,9 +139,7 @@ public class LuceneWriteIndexFromFileExample
     	//Directory?
     	
         if (Files.isDirectory(path))
-        {
-        	//int count_of_docs = 0, mi=0;
-        	
+        {	
             //Iterate directory
             Files.walkFileTree(path, new SimpleFileVisitor<Path>()
             {
@@ -184,6 +182,37 @@ public class LuceneWriteIndexFromFileExample
         }
     }
     
+    static void moveDocuments(Path path) throws IOException {
+    	Files.walkFileTree(path, new SimpleFileVisitor<Path>()
+        {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException
+            {
+                count_of_docs += 1;    
+                
+                String file_name = file.toString().split("/")[1];
+                String destination = "all_tweets/" + file_name;
+                System.out.printf("%s %s %s\n", file_name, destination, file.toString());
+                
+                try {
+                    Path temp = Files.move (Paths.get(file.toString()),  Paths.get(destination));
+                    if(temp != null) 
+                    { 
+                        System.out.println("File renamed and moved successfully"); 
+                    } 
+                    else
+                    { 
+                        System.out.println("Failed to move the file"); 
+                    }
+                }
+                catch (IOException e) {
+            		e.printStackTrace();
+            	}
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
+    
     
     static void mergeIndexes(String main_index, String auxillary_index, String index_path) {
     	
@@ -205,9 +234,14 @@ public class LuceneWriteIndexFromFileExample
 			}
     		
     		System.out.print(count_of_docs);
-    		/*if(count_of_docs > 30) {
+    		if(count_of_docs > 30) {
+    			try {
+					moveDocuments(docDir);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
     			joinIndexes(main_index, auxillary_index, index_path);
-    		}*/
+    		}
     	}
     	else {
     		joinIndexes(main_index, auxillary_index, index_path);
