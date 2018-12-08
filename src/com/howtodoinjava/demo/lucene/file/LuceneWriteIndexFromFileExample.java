@@ -8,7 +8,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
- 
+import java.nio.file.*; 
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -50,7 +51,7 @@ public class LuceneWriteIndexFromFileExample
     	}
     	else if (inp == 3) {
     		System.out.println("merging");
-    		mergeIndexes("main_index", "auxillary_index");
+    		mergeIndexes("main_index", "auxillary_index", "merged_index");
     		System.exit(0);
     	}
     	else {
@@ -71,7 +72,7 @@ public class LuceneWriteIndexFromFileExample
              
             //IndexWriter Configuration
             IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-            iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
+            iwc.setOpenMode(OpenMode.CREATE);
              
             //IndexWriter writes new index files to the directory
             IndexWriter writer = new IndexWriter(dir, iwc);
@@ -87,14 +88,11 @@ public class LuceneWriteIndexFromFileExample
         }
     }
     
-    static void mergeIndexes(String main_index, String auxillary_index) {
-    	String indexPath = "merged_index";
-    	System.out.println("Press 1 for checking index size and merging and 2 for manual merge(Not Recommended)");
+    static void joinIndexes(String main_index, String auxillary_index, String index_path) {
     	try {
-    		System.out.printf("%d savage\n", 21);
     		Date start = new Date(); 
     		
-	    	Directory dir = FSDirectory.open( Paths.get(indexPath) );
+	    	Directory dir = FSDirectory.open( Paths.get(index_path) );
 	    	Directory dir_main = FSDirectory.open( Paths.get(main_index) );
 	    	Directory dir_aux = FSDirectory.open( Paths.get(auxillary_index) );
 	    	
@@ -102,7 +100,7 @@ public class LuceneWriteIndexFromFileExample
 	        Analyzer analyzer = new StandardAnalyzer();
 	        
 	        IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-	        iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
+	        iwc.setOpenMode(OpenMode.CREATE);
 	        IndexWriter writer = new IndexWriter(dir, iwc);
 	        
 	        Directory[] INDEXES_DIR = {dir_main, dir_aux}; 
@@ -119,6 +117,11 @@ public class LuceneWriteIndexFromFileExample
             writer.addIndexes(indexes);
             System.out.println("done");
 	    	
+            System.out.print("Optimizing index...");
+//            writer.optimize();
+            writer.close();
+            System.out.println("done");
+            
 	    	//writer.setMergeFactor(1000);
 	    	//writer.setRAMBufferSizeMB(50);
             Date end = new Date();
@@ -128,6 +131,89 @@ public class LuceneWriteIndexFromFileExample
     	catch (IOException e) {
     		e.printStackTrace();
     	}
+    }
+    
+    static int count_of_docs = 0;
+    static void numberOfDocumentsInDirectory(Path path) throws IOException
+    {
+    	//Directory?
+    	
+        if (Files.isDirectory(path))
+        {
+        	//int count_of_docs = 0, mi=0;
+        	
+            //Iterate directory
+            Files.walkFileTree(path, new SimpleFileVisitor<Path>()
+            {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException
+                {
+                    count_of_docs += 1;    
+                    
+                    String file_name = file.toString().split("/")[1];
+                    String destination = "all_tweets/" + file_name;
+                    System.out.printf("%s %s %s\n", file_name, destination, file.toString());
+                    
+                    try {
+	                    Path temp = Files.move (Paths.get(file.toString()),  Paths.get(destination));
+	                    if(temp != null) 
+	                    { 
+	                        System.out.println("File renamed and moved successfully"); 
+	                    } 
+	                    else
+	                    { 
+	                        System.out.println("Failed to move the file"); 
+	                    }
+                    }
+                    catch (IOException e) {
+                		e.printStackTrace();
+                	}
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        }
+        else
+        {
+            //Index this file
+        	
+            
+            /*
+             * increment number of tweets indexed
+             * 
+             */
+        }
+    }
+    
+    
+    static void mergeIndexes(String main_index, String auxillary_index, String index_path) {
+    	
+    	System.out.println("Press 1 for checking index size and merging and 2 for manual merge(Not Recommended)");
+    	
+    	Scanner sc = new Scanner(System.in);
+    	int inp = sc.nextInt();
+    	
+    	
+    	
+    	if (inp == 1) {
+    		
+    		final Path docDir = Paths.get("new_tweets");
+    		
+    		try {
+				numberOfDocumentsInDirectory(docDir);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+    		
+    		System.out.print(count_of_docs);
+    		/*if(count_of_docs > 30) {
+    			joinIndexes(main_index, auxillary_index, index_path);
+    		}*/
+    	}
+    	else {
+    		joinIndexes(main_index, auxillary_index, index_path);
+    	}
+    	
+    	
     }
      
     static void indexDocs(final IndexWriter writer, Path path) throws IOException
