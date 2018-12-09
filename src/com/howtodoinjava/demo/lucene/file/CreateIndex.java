@@ -226,7 +226,6 @@ public class CreateIndex
     	if (inp == 1) {
     		
     		final Path docDir = Paths.get("new_tweets");
-    		
     		try {
 				numberOfDocumentsInDirectory(docDir);
 			} catch (IOException e) {
@@ -236,17 +235,24 @@ public class CreateIndex
     		System.out.print(count_of_docs);
     		if(count_of_docs > 30) {
     			try {
-					moveDocuments(docDir);
+    				joinIndexes(main_index, auxillary_index, index_path);
+					moveDocuments(docDir);	
+//					renamePathInIndex();			
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-    			joinIndexes(main_index, auxillary_index, index_path);
     		}
     	}
     	else {
     		joinIndexes(main_index, auxillary_index, index_path);
     	}
     	
+    	
+    }
+    
+    static void renamePathInIndex() throws IOException {
+    	Directory dir;
+    	dir = FSDirectory.open(Paths.get("merged_index"));
     	
     }
      
@@ -298,7 +304,10 @@ public class CreateIndex
              * Preprocess Files.readAllBytes, add fields accordingly
              */
              
-            doc.add(new StringField("path", file.toString(), Field.Store.YES));
+            String[] path = file.toString().split("/");
+            int length_of_path = path.length;
+            
+            doc.add(new StringField("path", path[length_of_path-1], Field.Store.YES));
             doc.add(new LongPoint("modified", lastModified));
             doc.add(new TextField("contents", new String(Files.readAllBytes(file)), Store.YES));
              
@@ -313,7 +322,7 @@ public class CreateIndex
             //containing <code>term</code> and then adding the new
             //document.  The delete and then add are atomic as seen
             //by a reader on the same index
-            writer.updateDocument(new Term("path", file.toString()), doc);
+            writer.updateDocument(new Term("path", path[length_of_path-1]), doc);
         }
     }
 }
