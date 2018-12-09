@@ -34,7 +34,7 @@ public class CreateIndex
 {
     public static void main(String[] args)
     {
-    	System.out.println("Enter 1 to create main index, 2 to create initial auxillary index, 3 to merge indexes \n");
+    	System.out.println("Enter 1 to create main index, 2 to create auxillary index, 3 to Merge Indexes - Perform Merge After building auxiliary index alwasy. \n");
     	
     	Scanner sc = new Scanner(System.in);
     	
@@ -54,6 +54,7 @@ public class CreateIndex
     	else if (inp == 3) {
     		System.out.println("merging");
     		mergeIndexes("main_index", "auxillary_index", "merged_index");
+    		
     		System.exit(0);
     	}
     	else {
@@ -65,21 +66,16 @@ public class CreateIndex
         final Path docDir = Paths.get(docsPath);
  
         try
-        {
-            //org.apache.lucene.store.Directory instance
+        {            
             Directory dir = FSDirectory.open( Paths.get(indexPath) );
-             
-            //analyzer with the default stop words
+                         
             Analyzer analyzer = new StandardAnalyzer();
              
-            //IndexWriter Configuration
             IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
             iwc.setOpenMode(OpenMode.CREATE);
              
-            //IndexWriter writes new index files to the directory
             IndexWriter writer = new IndexWriter(dir, iwc);
              
-            //Its recursive method to iterate all files and directories
             indexDocs(writer, docDir);
  
             writer.close();

@@ -39,24 +39,26 @@ public class QueryOnIndex
         TopDocs foundDocsNew = searchInContent(query, searcher_auxillary_index);
          
         //Total found documents
-        System.out.println("Total Results from Merged Index :: " + foundDocs.totalHits);
-         
-        //Let's print out the path of files which have searched term
-        for (ScoreDoc sd : foundDocs.scoreDocs)
-        {
-            Document d = searcher.doc(sd.doc);
-            System.out.println("Path : "+ d.get("document_name") + ", Score : " + sd.score);
-        }
-        
-        //Total found documents
         System.out.println("Total Results from Auxillary Index :: " + foundDocsNew.totalHits);
          
         //Let's print out the path of files which have searched term
         for (ScoreDoc sd : foundDocsNew.scoreDocs)
         {
             Document d = searcher_auxillary_index.doc(sd.doc);
-            System.out.println("Path : "+ d.get("document_name") + ", Score : " + sd.score);
+            System.out.println("Doc Name : "+ d.get("document_name") + ", Score : " + sd.score);
         }
+        
+        //Total found documents
+        System.out.println("Total Results from Merged Main Index :: " + foundDocs.totalHits);
+         
+        //Let's print out the path of files which have searched term
+        for (ScoreDoc sd : foundDocs.scoreDocs)
+        {
+            Document d = searcher.doc(sd.doc);
+            System.out.println("Doc Name : "+ d.get("document_name") + ", Score : " + sd.score);
+        }
+        
+       
     }
      
     private static TopDocs searchInContent(String textToFind, IndexSearcher searcher) throws Exception
