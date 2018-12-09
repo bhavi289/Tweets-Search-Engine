@@ -1,7 +1,9 @@
 package com.howtodoinjava.demo.lucene.file;
- 
+import org.apache.commons.io.FileUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.File;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -88,14 +90,33 @@ public class CreateIndex
         }
     }
     
+    static void postProcess() {
+    	try {
+			FileUtils.deleteDirectory(new File("main_index"));
+			
+			//create source File object
+		    File oldName = new File("merged_index");
+		   
+		    //create destination File object
+		    File newName = new File("main_index");
+		    
+		    boolean isFileRenamed = oldName.renameTo(newName);
+		    
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
     static void joinIndexes(String main_index, String auxillary_index, String index_path) {
     	try {
-    		Date start = new Date(); 
-    		
-	    	Directory dir = FSDirectory.open( Paths.get(index_path) );
-	    	Directory dir_main = FSDirectory.open( Paths.get(main_index) );
-	    	Directory dir_aux = FSDirectory.open( Paths.get(auxillary_index) );
+    		Date start = new Date(); 	    	
 	    	
+	    	Directory dir = FSDirectory.open( Paths.get("merged_index") );
+	    	
+	    	Directory dir_main = FSDirectory.open( Paths.get(main_index) );
+	    	
+	    	Directory dir_aux = FSDirectory.open( Paths.get(auxillary_index) );
 	        
 	        Analyzer analyzer = new StandardAnalyzer();
 	        
@@ -116,17 +137,14 @@ public class CreateIndex
 	        System.out.print("Merging added indexes...");
             writer.addIndexes(indexes);
             System.out.println("done");
-	    	
-            System.out.print("Optimizing index...");
-//            writer.optimize();
+
             writer.close();
-            System.out.println("done");
+
+         
+            writer.close();
             
-	    	//writer.setMergeFactor(1000);
-	    	//writer.setRAMBufferSizeMB(50);
-            Date end = new Date();
-            writer.close();
-            System.out.println("It took: "+((end.getTime() - start.getTime()) / 1000) + "\"");
+            postProcess();
+//            
     	}
     	catch (IOException e) {
     		e.printStackTrace();
@@ -195,10 +213,10 @@ public class CreateIndex
     	
     	Scanner sc = new Scanner(System.in);
     	int inp = sc.nextInt();
-    		
+    	final Path docDir = Paths.get("new_tweets");
     	if (inp == 1) {
     		
-    		final Path docDir = Paths.get("new_tweets");
+    		
     		try {
 				numberOfDocumentsInDirectory(docDir);
 			} catch (IOException e) {
@@ -215,11 +233,18 @@ public class CreateIndex
 				}
     		}
     		else {
-    			joinIndexes(main_index, auxillary_index, index_path);
+//    			joinIndexes(main_index, auxillary_index, index_path);
+    			System.out.println("\nAuxiliary Index not big enough for merge");
     		}
     	}
     	else {
     		joinIndexes(main_index, auxillary_index, index_path);
+    		try {
+				moveDocuments(docDir);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
     	}
     	
     	
@@ -290,7 +315,7 @@ public class CreateIndex
              
             // Files.readAllBytes contains file contents i think
             
-//            System.out.println("indexed");
+//           System.out.println("indexed");
 //        	System.out.println(doc);
 //        	System.out.println("indexed");
             

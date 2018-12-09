@@ -19,7 +19,7 @@ import org.apache.lucene.store.FSDirectory;
 public class QueryOnIndex
 {
     //directory contains the lucene indexes
-    private static final String MAIN_INDEX = "merged_index";
+    private static final String MAIN_INDEX = "main_index";
     private static final String AUXILLARY_INDEX = "auxillary_index";
  
     public static void main(String[] args) throws Exception
@@ -39,7 +39,7 @@ public class QueryOnIndex
         TopDocs foundDocsNew = searchInContent(query, searcher_auxillary_index);
          
         //Total found documents
-        System.out.println("Total Results from Main Index :: " + foundDocs.totalHits);
+        System.out.println("Total Results from Merged Index :: " + foundDocs.totalHits);
          
         //Let's print out the path of files which have searched term
         for (ScoreDoc sd : foundDocs.scoreDocs)
