@@ -93,6 +93,7 @@ public class CreateIndex
     static void postProcess() {
     	try {
 			FileUtils.deleteDirectory(new File("main_index"));
+//			FileUtils.deleteDirectory(new File("auxillary_index"));
 			
 			//create source File object
 		    File oldName = new File("merged_index");
@@ -312,18 +313,7 @@ public class CreateIndex
             doc.add(new StringField("document_name", path[length_of_path-1], Field.Store.YES));
             doc.add(new LongPoint("modified", lastModified));
             doc.add(new TextField("contents", new String(Files.readAllBytes(file)), Store.YES));
-             
-            // Files.readAllBytes contains file contents i think
-            
-//           System.out.println("indexed");
-//        	System.out.println(doc);
-//        	System.out.println("indexed");
-            
-            
-            //Updates a document by first deleting the document(s)
-            //containing <code>term</code> and then adding the new
-            //document.  The delete and then add are atomic as seen
-            //by a reader on the same index
+                 
             writer.updateDocument(new Term("document_name", path[length_of_path-1]), doc);
             
             System.out.printf("%d.) Document Name- %s\n",count++, path[length_of_path-1]);
