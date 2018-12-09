@@ -2,7 +2,8 @@ package com.howtodoinjava.demo.lucene.file;
  
 import java.io.IOException;
 import java.nio.file.Paths;
- 
+import java.util.Scanner;
+
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
@@ -27,10 +28,15 @@ public class QueryOnIndex
         //Create 2 lucene searchesr. One searches over a single IndexReader. Other over auxillary index
         IndexSearcher searcher = createSearcher(true);
         IndexSearcher searcher_auxillary_index = createSearcher(false);
+        
+        System.out.println("Enter Query\n");
+        
+        Scanner sc = new Scanner(System.in);
+    	String query = sc.nextLine();
          
         //Search indexed contents using search term
-        TopDocs foundDocs = searchInContent("million", searcher);
-        TopDocs foundDocsNew = searchInContent("million", searcher_auxillary_index);
+        TopDocs foundDocs = searchInContent(query, searcher);
+        TopDocs foundDocsNew = searchInContent(query, searcher_auxillary_index);
          
         //Total found documents
         System.out.println("Total Results from Main Index :: " + foundDocs.totalHits);
