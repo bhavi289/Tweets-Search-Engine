@@ -35,7 +35,7 @@ public class CreateIndex
 {
     public static void main(String[] args)
     {
-    	System.out.println("Enter 1 to create main index, 2 to create auxillary index, 3 to Merge Indexes - Perform Merge After building auxiliary index alwasy. \n");
+    	System.out.println("Enter 1 to create main index, 2 to create auxillary index, 3 to Merge Indexes - Perform Merge After building auxiliary index always. \n");
     	
     	Scanner sc = new Scanner(System.in);
     	
@@ -214,7 +214,6 @@ public class CreateIndex
     	final Path docDir = Paths.get("new_tweets");
     	if (inp == 1) {
     		
-    		
     		try {
 				numberOfDocumentsInDirectory(docDir);
 			} catch (IOException e) {
@@ -222,7 +221,8 @@ public class CreateIndex
 			}
     		
     		System.out.print(count_of_docs);
-    		if(count_of_docs > 30) {
+    		
+    		if(count_of_docs >= 100) {
     			try {
     				joinIndexes(main_index, auxillary_index, index_path);
 					moveDocuments(docDir);				
@@ -231,7 +231,6 @@ public class CreateIndex
 				}
     		}
     		else {
-//    			joinIndexes(main_index, auxillary_index, index_path);
     			System.out.println("\nAuxiliary Index not big enough for merge");
     		}
     	}
@@ -301,12 +300,12 @@ public class CreateIndex
              * Preprocess Files.readAllBytes, add fields accordingly
              */
             
-//            System.out.println(new String(Files.readAllBytes(file)));
-//            System.out.printf("%s\n", new String(Files.readAllBytes(file)));
-            
+//          System.out.println(new String(Files.readAllBytes(file)));
+//          System.out.printf("%s\n", new String(Files.readAllBytes(file)));
+//          System.out.println(jsonObj.get("text")+ "" + (String) jsonObj.get("created_at"));            
             
             JSONObject jsonObj = new JSONObject(new String(Files.readAllBytes(file)));
-            System.out.println(jsonObj.get("text")+ "" + (String) jsonObj.get("created_at"));
+
            
             String[] path = file.toString().split("/");
             int length_of_path = path.length;
