@@ -146,39 +146,14 @@ public class CreateIndex
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException
                 {
-                    count_of_docs += 1;    
-                    
-                    String file_name = file.toString().split("/")[1];
-                    String destination = "all_tweets/" + file_name;
-                    System.out.printf("%s %s %s\n", file_name, destination, file.toString());
-                    
-                    try {
-	                    Path temp = Files.move (Paths.get(file.toString()),  Paths.get(destination));
-	                    if(temp != null) 
-	                    { 
-	                        System.out.println("File renamed and moved successfully"); 
-	                    } 
-	                    else
-	                    { 
-	                        System.out.println("Failed to move the file"); 
-	                    }
-                    }
-                    catch (IOException e) {
-                		e.printStackTrace();
-                	}
+                    count_of_docs += 1;
                     return FileVisitResult.CONTINUE;
                 }
             });
         }
         else
         {
-            //Index this file
         	
-            
-            /*
-             * increment number of tweets indexed
-             * 
-             */
         }
     }
     
@@ -220,9 +195,7 @@ public class CreateIndex
     	
     	Scanner sc = new Scanner(System.in);
     	int inp = sc.nextInt();
-    	
-    	
-    	
+    		
     	if (inp == 1) {
     		
     		final Path docDir = Paths.get("new_tweets");
@@ -236,11 +209,13 @@ public class CreateIndex
     		if(count_of_docs > 30) {
     			try {
     				joinIndexes(main_index, auxillary_index, index_path);
-					moveDocuments(docDir);	
-//					renamePathInIndex();			
+					moveDocuments(docDir);				
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+    		}
+    		else {
+    			joinIndexes(main_index, auxillary_index, index_path);
     		}
     	}
     	else {
@@ -292,8 +267,10 @@ public class CreateIndex
         }
     }
  
+    static int count = 1;
     static void indexDoc(IndexWriter writer, Path file, long lastModified) throws IOException
     {
+    	
         try (InputStream stream = Files.newInputStream(file))
         {
         	
@@ -307,22 +284,24 @@ public class CreateIndex
             String[] path = file.toString().split("/");
             int length_of_path = path.length;
             
-            doc.add(new StringField("path", path[length_of_path-1], Field.Store.YES));
+            doc.add(new StringField("document_name", path[length_of_path-1], Field.Store.YES));
             doc.add(new LongPoint("modified", lastModified));
             doc.add(new TextField("contents", new String(Files.readAllBytes(file)), Store.YES));
              
             // Files.readAllBytes contains file contents i think
             
-            System.out.println("indexed");
-        	System.out.println(doc);
-        	System.out.println("indexed");
+//            System.out.println("indexed");
+//        	System.out.println(doc);
+//        	System.out.println("indexed");
             
             
             //Updates a document by first deleting the document(s)
             //containing <code>term</code> and then adding the new
             //document.  The delete and then add are atomic as seen
             //by a reader on the same index
-            writer.updateDocument(new Term("path", path[length_of_path-1]), doc);
+            writer.updateDocument(new Term("document_name", path[length_of_path-1]), doc);
+            
+            System.out.printf("%d.) Document Name- %s\n",count++, path[length_of_path-1]);
         }
     }
 }

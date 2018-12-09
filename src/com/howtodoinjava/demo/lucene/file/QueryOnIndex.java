@@ -29,8 +29,8 @@ public class QueryOnIndex
         IndexSearcher searcher_auxillary_index = createSearcher(false);
          
         //Search indexed contents using search term
-        TopDocs foundDocs = searchInContent("#CBI", searcher);
-        TopDocs foundDocsNew = searchInContent("#CBI", searcher_auxillary_index);
+        TopDocs foundDocs = searchInContent("million", searcher);
+        TopDocs foundDocsNew = searchInContent("million", searcher_auxillary_index);
          
         //Total found documents
         System.out.println("Total Results from Main Index :: " + foundDocs.totalHits);
@@ -39,7 +39,7 @@ public class QueryOnIndex
         for (ScoreDoc sd : foundDocs.scoreDocs)
         {
             Document d = searcher.doc(sd.doc);
-            System.out.println("Path : "+ d.get("path") + ", Score : " + sd.score);
+            System.out.println("Path : "+ d.get("document_name") + ", Score : " + sd.score);
         }
         
         //Total found documents
@@ -49,7 +49,7 @@ public class QueryOnIndex
         for (ScoreDoc sd : foundDocsNew.scoreDocs)
         {
             Document d = searcher_auxillary_index.doc(sd.doc);
-            System.out.println("Path : "+ d.get("path") + ", Score : " + sd.score);
+            System.out.println("Path : "+ d.get("document_name") + ", Score : " + sd.score);
         }
     }
      
