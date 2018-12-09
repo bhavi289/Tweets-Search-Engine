@@ -1,5 +1,6 @@
 package com.howtodoinjava.demo.lucene.file;
 import org.apache.commons.io.FileUtils;
+import org.json.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -89,7 +90,7 @@ public class CreateIndex
     static void postProcess() {
     	try {
 			FileUtils.deleteDirectory(new File("main_index"));
-//			FileUtils.deleteDirectory(new File("auxillary_index"));
+			FileUtils.deleteDirectory(new File("auxillary_index")); 
 			
 			//create source File object
 		    File oldName = new File("merged_index");
@@ -242,9 +243,7 @@ public class CreateIndex
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}	
-    	}
-    	
-    	
+    	}    	
     }
     
     static void renamePathInIndex() throws IOException {
@@ -295,24 +294,31 @@ public class CreateIndex
     	
         try (InputStream stream = Files.newInputStream(file))
         {
-        	
             //Create lucene Document
             Document doc = new Document();
             
             /*
              * Preprocess Files.readAllBytes, add fields accordingly
              */
-             
+            
+//            System.out.println(new String(Files.readAllBytes(file)));
+//            System.out.printf("%s\n", new String(Files.readAllBytes(file)));
+            
+            
+            JSONObject jsonObj = new JSONObject(new String(Files.readAllBytes(file)));
+            System.out.println(jsonObj.get("text")+ "" + (String) jsonObj.get("created_at"));
+           
             String[] path = file.toString().split("/");
             int length_of_path = path.length;
-            
+            		
             doc.add(new StringField("document_name", path[length_of_path-1], Field.Store.YES));
             doc.add(new LongPoint("modified", lastModified));
-            doc.add(new TextField("contents", new String(Files.readAllBytes(file)), Store.YES));
-                 
+            doc.add(new TextField("contents", (String) jsonObj.get("text"), Store.YES));
+            doc.add(new TextField("tweet_date", (String) jsonObj.get("created_at"), Field.Store.YES));
             writer.updateDocument(new Term("document_name", path[length_of_path-1]), doc);
             
             System.out.printf("%d.) Document Name- %s\n",count++, path[length_of_path-1]);
+            
         }
     }
 }

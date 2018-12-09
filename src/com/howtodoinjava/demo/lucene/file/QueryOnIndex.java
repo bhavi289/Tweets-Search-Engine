@@ -1,5 +1,5 @@
 package com.howtodoinjava.demo.lucene.file;
- 
+import java.nio.file.*; 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Scanner;
@@ -21,44 +21,50 @@ public class QueryOnIndex
     //directory contains the lucene indexes
     private static final String MAIN_INDEX = "main_index";
     private static final String AUXILLARY_INDEX = "auxillary_index";
- 
+    
+    static boolean check = false;
+    
     public static void main(String[] args) throws Exception
     {
-    	
-        //Create 2 lucene searchesr. One searches over a single IndexReader. Other over auxillary index
-        IndexSearcher searcher = createSearcher(true);
-        IndexSearcher searcher_auxillary_index = createSearcher(false);
-        
-        System.out.println("Enter Query\n");
+    	System.out.println("Enter Query\n");
         
         Scanner sc = new Scanner(System.in);
     	String query = sc.nextLine();
-         
-        //Search indexed contents using search term
-        TopDocs foundDocs = searchInContent(query, searcher);
-        TopDocs foundDocsNew = searchInContent(query, searcher_auxillary_index);
-         
-        //Total found documents
-        System.out.println("Total Results from Auxillary Index :: " + foundDocsNew.totalHits);
-         
-        //Let's print out the path of files which have searched term
-        for (ScoreDoc sd : foundDocsNew.scoreDocs)
-        {
-            Document d = searcher_auxillary_index.doc(sd.doc);
-            System.out.println("Doc Name : "+ d.get("document_name") + ", Score : " + sd.score);
-        }
+            	
+    	if (Files.exists(Paths.get(AUXILLARY_INDEX))) {
+    		check = true;
+    	}
+    	else {
+    		check = false;
+    	}
+    	
         
-        //Total found documents
+        
+        //Search indexed contents using search term
+        
+        if (check) {
+        	IndexSearcher searcher_auxillary_index = createSearcher(false);
+        	TopDocs foundDocsNew = searchInContent(query, searcher_auxillary_index);
+                 
+        	System.out.println("Total Results from Auxillary Index :: " + foundDocsNew.totalHits);
+         
+        	for (ScoreDoc sd : foundDocsNew.scoreDocs)
+        	{
+        		Document d = searcher_auxillary_index.doc(sd.doc);
+        		System.out.println("Doc Name : "+ d.get("document_name") + " Tweeted on : " + d.get("tweet_date") + ", Score : " + sd.score);
+        	}
+    	}
+        
+        IndexSearcher searcher = createSearcher(true);
+        TopDocs foundDocs = searchInContent(query, searcher);
+        
         System.out.println("Total Results from Merged Main Index :: " + foundDocs.totalHits);
          
-        //Let's print out the path of files which have searched term
         for (ScoreDoc sd : foundDocs.scoreDocs)
         {
             Document d = searcher.doc(sd.doc);
-            System.out.println("Doc Name : "+ d.get("document_name") + ", Score : " + sd.score);
-        }
-        
-       
+            System.out.println("Doc Name : "+ d.get("document_name") + " Tweeted on : " + d.get("tweet_date")  + ", Score : " + sd.score);
+        }       
     }
      
     private static TopDocs searchInContent(String textToFind, IndexSearcher searcher) throws Exception
