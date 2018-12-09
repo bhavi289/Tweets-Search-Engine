@@ -28,7 +28,7 @@ import org.apache.lucene.store.FSDirectory;
 import java.util.Date;
 import java.util.Scanner; 
 
-public class LuceneWriteIndexFromFileExample
+public class CreateIndex
 {
     public static void main(String[] args)
     {

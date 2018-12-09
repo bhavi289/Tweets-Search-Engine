@@ -15,7 +15,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
  
-public class LuceneReadIndexFromFileExample
+public class QueryOnIndex
 {
     //directory contains the lucene indexes
     private static final String MAIN_INDEX = "merged_index";
