@@ -2,10 +2,10 @@ import tweepy
 import csv
 import pandas as pd
 import json
-consumer_key = 'fJlYi6iYBTULX2CxiWwmSvr8S'
-consumer_secret = 'QDdqY2V6TgN4khKRi3xImCzWqulCHWGJVM9t9OTE9uBaL4d8ut'
-access_token = '825220709618061312-aqdeyEQjS4Jed0PcAKwm5elqMx6Kp5o'
-access_token_secret = 'CDa6puk2M4JZZQTi5MKYAq6Enu0zMakQMZX0mx5Trh96p'
+consumer_key = '???'
+consumer_secret = '???'
+access_token = '???'
+access_token_secret = '???'
 t = open("trends_file.txt","a")
 try:
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
